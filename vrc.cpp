@@ -1,5 +1,8 @@
 #include "vrc.h"
 #include "QDebug"
+#include <QPixmap>
+#include <QPainter>
+#include <QTextItem>
 
 VRCReader::VRCReader() :
     _header(new VRCHeader),
@@ -50,7 +53,7 @@ void VRCReader::openFile(QString fn)
         return;
     }
     _timer->setInterval(10);
-    _numberOfBytesRead = _file->read((char*)_header, sizeof(VRCHeader));
+    _numberOfBytesRead = _file->read(reinterpret_cast<char*>(_header), sizeof(VRCHeader));
     _fWidth = _header->fWidth;
     _fHeight = _header->fHeight;
     _fSize = _fWidth * _fHeight;
@@ -58,8 +61,9 @@ void VRCReader::openFile(QString fn)
     {
         qDebug() << "metadata";
     }
-    _mat = new cv::Mat(_fHeight, _fWidth, CV_8UC1);
-    _colMat = new cv::Mat(_fHeight, _fWidth, CV_8UC3);
+    _image = QImage(static_cast<int>(_fWidth),
+                    static_cast<int>(_fHeight),
+                    QImage::Format_Indexed8);
     emit metaData(_header);
     qDebug() << _header->fWidth << " x " << _header->fHeight;
 }
@@ -89,54 +93,45 @@ void VRCReader::timeout()
         emit lastFrame();
     }
 
-    quint64 pos = _frameNumber * _fSize + 128;//_file->pos();
+    qint64 pos = _frameNumber * _fSize + 128;//_file->pos();
     _file->seek(pos);
-    _numberOfBytesRead = _file->read((char*)_mat->data, _fSize);
-    _frameHeader.b = (char*)_mat->data;
+    _numberOfBytesRead = _file->read(reinterpret_cast<char*>(_image.bits()), _fSize);
+    _frameHeader.b = reinterpret_cast<char*>(_image.bits());
 
     output();
 
-    emit newFrame(_frameNumber);
+    emit newFrame(static_cast<int>(_frameNumber));
 }
 /////////////////////////////////////////////////////////
 void VRCReader::rewind(int num)
 {
-    quint64 pos = num * _fSize + 128;
+    qint64 pos = num * _fSize + 128;
     _frameNumber = num;
     _file->seek(pos);
-    _numberOfBytesRead = _file->read((char*)_mat->data, _fSize);
-    _frameHeader.b = (char*)_mat->data;
+    _numberOfBytesRead = _file->read(reinterpret_cast<char*>(_image.bits()), _fSize);
+    _frameHeader.b = reinterpret_cast<char*>(_image.bits());
     emit newFrame(num);
     output();
 
 }
 /////////////////////////////////////////////////////////
 void VRCReader::output() {
-    std::vector<cv::Mat> mats;
-    mats.push_back(*_mat);
-    mats.push_back(*_mat);
-    mats.push_back(*_mat);
-    mats.push_back(*_mat);
-    cv::merge(mats, *_colMat);
+    QImage image = _image.convertToFormat(QImage::Format_RGB32);
+    _label.setPixmap(QPixmap::fromImage(image));
     if (_putTextToImage) {
-        int font = cv::FONT_HERSHEY_PLAIN;
-        cv::Scalar color = cv::Scalar(255, 0, 255);
-        //cv::putText(*_colMat, "fInterval   = " + QString::number(_header->fInterval).toStdString(), cv::Point(2, 15), font, 0.5, cv::Scalar(255, 255, 0));
-        cv::putText(*_colMat,
-                    "Azimuth  = " + QString::number(_frameHeader.h->az).toStdString(),
-                    cv::Point(2, 15), font, 1, color);
-        cv::putText(*_colMat,
-                    "Elevation = " + QString::number(_frameHeader.h->el).toStdString(),
-                    cv::Point(2, 30), font, 1, color);
-        cv::putText(*_colMat,
-                    "R  = " + QString::number(_frameHeader.h->r).toStdString(),
-                    cv::Point(2, 45), font, 1, color);
-        //cv::putText(*_colMat, "Elevation = " + QString::number(_frameHeader.h->el).toStdString(), cv::Point(2, 30), font, 1, color);
+        // todo: not drawn. fix it
+        QPainter painter(&image);
+        painter.drawText(QRect(5, 5, 200, 50), 0, QString("fInterval\t=%1\n"
+                                               "Azimuth\t=%2\n"
+                                               "Elevation\t=%3\n"
+                                               "R\t\t=%4")
+                         .arg(_header->fInterval)
+                         .arg(_frameHeader.h->az)
+                         .arg(_frameHeader.h->el)
+                         .arg(_frameHeader.h->r));
+        painter.end();
     }
-    //cv::imshow("vrc", *_colMat);
-    cv::imshow("vrc", *_colMat);
-    //cv::imshow("vrc", *_colMat);
-
+    _label.show();
 }
 /////////////////////////////////////////////////////////
 void VRCReader::saveFrame()
@@ -147,8 +142,8 @@ void VRCReader::saveFrame()
             _fileInfo->baseName() +
             "_frame#" + QString::number(_frameNumber) +
             ".bmp";
-
-    cv::imwrite(fn.toStdString(), *_mat);
+    // todo: doesn't work. Learn why and fix.
+    _image.save(fn);
     qDebug() << fn;
 }
 /////////////////////////////////////////////////////////

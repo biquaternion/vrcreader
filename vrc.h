@@ -7,12 +7,12 @@
 //#include "QtGlobal"
 #include "QFile"
 #include "QFileInfo"
-#include "opencv2/opencv.hpp"
 #include <QThread>
 #include <QObject>
 #include <QString>
 #include <QTimer>
-//#include <FrameIterator.h>
+#include <QImage>
+#include <QLabel>
 
 class VRCReader;
 
@@ -52,7 +52,6 @@ union uFrameHeader
     char        *b;
 };
 
-
 class VRCReader : public QThread
 {
     Q_OBJECT
@@ -83,7 +82,6 @@ private:
     bool        _isFrameHeader;
     QFile       *_file;
     QFileInfo   *_fileInfo;
-//    QFile       *_outputFile;
     QTimer      *_timer;
 
     qint64      _fSize;
@@ -92,8 +90,8 @@ private:
     qint64      _frameNumber;
     bool        _putTextToImage;
 
-    cv::Mat     *_mat;
-    cv::Mat     *_colMat;
+    QImage      _image;
+    QLabel      _label;
 
     Direction   _dir;
 
