@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QFileDialog>
 #include <QListView>
+#include <QSettings>
 #include "vrc.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -36,8 +37,13 @@ MainWindow::~MainWindow()
 
 void MainWindow::onOpenClick()
 {
-    _fileName = QFileDialog::getOpenFileName(0, "Choose File", "C:\\Dima\\WORK\\Sajene\\ARYA\\records");
+    QSettings settings(QString("NIIPP"),
+                       QString("vrcreader"));
+    auto workDir = settings.value(QString("work directory"), QVariant(QString(""))).toString();
+    _fileName = QFileDialog::getOpenFileName(this, "Choose File", workDir);
     emit takeFileName(_fileName, ui->cbOutput->isChecked());
+    workDir = QFileInfo(_fileName).dir().path();
+    settings.setValue(QString("work directory"), workDir);
 }
 void MainWindow::changeOutputFlag()
 {

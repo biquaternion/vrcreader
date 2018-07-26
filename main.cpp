@@ -5,40 +5,39 @@
 #include <QDebug>
 #include <QString>
 
-//#include "QObject"
 void readerStart(QString);
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
-    w.show();
 
-    auto reader = std::make_unique<VRCReader>();
+    VRCReader reader;
 
     QObject::connect(&w, SIGNAL(takeFileName(const QString &, bool)),
-                     reader.get(), SLOT(openFile(const QString &, bool)), Qt::DirectConnection);
+                     &reader, SLOT(openFile(const QString &, bool)));
     QObject::connect(&w, SIGNAL(onPlayClick()),
-                     reader.get(), SLOT(run()), Qt::DirectConnection);
+                     &reader, SLOT(run()), Qt::DirectConnection);
     QObject::connect(&w, SIGNAL(onPauseClick()),
-                     reader.get(), SLOT(pause()), Qt::DirectConnection);
+                     &reader, SLOT(pause()), Qt::DirectConnection);
     QObject::connect(&w, SIGNAL(destroyed()),
-                     reader.get(), SLOT(pause()),
+                     &reader, SLOT(pause()),
                      Qt::DirectConnection);
     QObject::connect(&w, SIGNAL(onSaveFrameClick()),
-                     reader.get(), SLOT(saveFrame()), Qt::DirectConnection);
+                     &reader, SLOT(saveFrame()), Qt::DirectConnection);
     QObject::connect(&w, SIGNAL(onBackClick()),
-                     reader.get(), SLOT(back()), Qt::DirectConnection);
+                     &reader, SLOT(back()), Qt::DirectConnection);
     QObject::connect(&w, SIGNAL(rewind(int)),
-                     reader.get(), SLOT(rewind(int)), Qt::DirectConnection);
+                     &reader, SLOT(rewind(int)), Qt::DirectConnection);
     QObject::connect(&w, SIGNAL(onCBOutputCLick(bool)),
-                     reader.get(), SLOT(setTextToImFlag(bool)), Qt::DirectConnection);
-    QObject::connect(reader.get(), SIGNAL(lastFrame()),
+                     &reader, SLOT(setTextToImFlag(bool)), Qt::DirectConnection);
+    QObject::connect(&reader, SIGNAL(lastFrame()),
                      &w, SIGNAL(onPauseClick()), Qt::DirectConnection);
-    QObject::connect(reader.get(), SIGNAL(metaData(VRCHeader*)),
+    QObject::connect(&reader, SIGNAL(metaData(VRCHeader*)),
                      &w, SLOT(metaData(VRCHeader*)), Qt::DirectConnection);
-    QObject::connect(reader.get(), SIGNAL(newFrame(int)),
+    QObject::connect(&reader, SIGNAL(newFrame(int)),
                      &w, SLOT(progressChanged(int)), Qt::DirectConnection);
 
+    w.show();
     return a.exec();
 }

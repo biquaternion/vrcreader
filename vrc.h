@@ -4,12 +4,10 @@
 
 #ifndef VRC_H
 #define VRC_H
-#include "QSet"
 #include "QFile"
 #include <QTimer>
 #include <QImage>
 #include <QLabel>
-#include <QThread>
 #include <QObject>
 #include <QString>
 #include "QFileInfo"
@@ -53,7 +51,7 @@ union uFrameHeader
     char        *b;
 };
 
-class VRCReader : public QThread
+class VRCReader : public QObject
 {
     Q_OBJECT
 public:

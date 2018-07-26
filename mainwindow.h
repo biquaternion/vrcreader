@@ -21,7 +21,6 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-    void openFile(QString);
     QString fileName() { return _fileName; }
 
 private:
