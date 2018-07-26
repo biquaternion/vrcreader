@@ -6,58 +6,37 @@
 
 VRCReader::VRCReader() :
     _header(new VRCHeader),
-    _isFrameHeader(false),
-    _file(new QFile(this)),
     _frameNumber(0),
     _dir(forward)
 {
-    this->moveToThread(this);
-    _timer = new QTimer();
-    QObject::connect(_timer, SIGNAL(timeout()),
-                     this, SLOT(timeout()), Qt::DirectConnection);
-}
-/////////////////////////////////////////////////////////
-VRCReader::VRCReader(QString s, bool putTxtToIm) :
-    _header(new VRCHeader),
-    _isFrameHeader(false),
-    _frameNumber(0),
-    _putTextToImage(putTxtToIm),
-    _dir(forward)
-{
-    this->moveToThread(this);
-    _timer = new QTimer();
-    openFile(s);
-    QObject::connect(_timer, SIGNAL(timeout()),
-                     this, SLOT(timeout()), Qt::DirectConnection);
 }
 /////////////////////////////////////////////////////////
 VRCReader::~VRCReader()
 {
-    if (_file->isOpen())
-        _file->close();
-    delete _file;
+    if (_file.isOpen())
+        _file.close();
     delete _header;
 }
 /////////////////////////////////////////////////////////
-void VRCReader::openFile(QString fn)
+void VRCReader::openFile(const QString &fn, bool putTxtToIm)
 {
-    if (_file->isOpen()) {
-        _file->close();
+    _putTextToImage = putTxtToIm;
+    if (_file.isOpen()) {
+        _file.close();
     }
     qDebug() << fn;
-    _file->setFileName(fn);
-    _fileInfo = new QFileInfo(*_file);
-    if (!_file->open(QIODevice::ReadOnly))
+    _file.setFileName(fn);
+    _fileInfo.setFile(_file);
+    if (!_file.open(QIODevice::ReadOnly))
     {
         qDebug() << "can't open file";
         return;
     }
-    _timer->setInterval(10);
-    _numberOfBytesRead = _file->read(reinterpret_cast<char*>(_header), sizeof(VRCHeader));
+    _numberOfBytesRead = _file.read(reinterpret_cast<char*>(_header), sizeof(VRCHeader));
     _fWidth = _header->fWidth;
     _fHeight = _header->fHeight;
     _fSize = _fWidth * _fHeight;
-    if (_file->bytesAvailable() % _fSize)
+    if (_file.bytesAvailable() % _fSize)
     {
         qDebug() << "metadata";
     }
@@ -66,14 +45,9 @@ void VRCReader::openFile(QString fn)
                     QImage::Format_Indexed8);
     emit metaData(_header);
     qDebug() << _header->fWidth << " x " << _header->fHeight;
-}
-/////////////////////////////////////////////////////////
-void VRCReader::openFile(QString *fn, bool putTxtToIm)
-{
-    _putTextToImage = putTxtToIm;
-    openFile(*fn);
-    if (_file->isOpen())
-        _timer->start();
+    if (_file.isOpen()) {
+        _timerId = this->startTimer(40);
+    }
 }
 /////////////////////////////////////////////////////////
 void VRCReader::timeout()
@@ -94,8 +68,8 @@ void VRCReader::timeout()
     }
 
     qint64 pos = _frameNumber * _fSize + 128;//_file->pos();
-    _file->seek(pos);
-    _numberOfBytesRead = _file->read(reinterpret_cast<char*>(_image.bits()), _fSize);
+    _file.seek(pos);
+    _numberOfBytesRead = _file.read(reinterpret_cast<char*>(_image.bits()), _fSize);
     _frameHeader.b = reinterpret_cast<char*>(_image.bits());
 
     output();
@@ -107,8 +81,8 @@ void VRCReader::rewind(int num)
 {
     qint64 pos = num * _fSize + 128;
     _frameNumber = num;
-    _file->seek(pos);
-    _numberOfBytesRead = _file->read(reinterpret_cast<char*>(_image.bits()), _fSize);
+    _file.seek(pos);
+    _numberOfBytesRead = _file.read(reinterpret_cast<char*>(_image.bits()), _fSize);
     _frameHeader.b = reinterpret_cast<char*>(_image.bits());
     emit newFrame(num);
     output();
@@ -136,10 +110,9 @@ void VRCReader::output() {
 /////////////////////////////////////////////////////////
 void VRCReader::saveFrame()
 {
-    //QString fn = _file->fileName() + "_frame_" + _frameNumber;
-    QString fp = _fileInfo->absolutePath();
+    QString fp = _fileInfo.absolutePath();
     QString fn = fp + "/" +
-            _fileInfo->baseName() +
+            _fileInfo.baseName() +
             "_frame#" + QString::number(_frameNumber) +
             ".bmp";
     // todo: doesn't work. Learn why and fix.
@@ -147,16 +120,30 @@ void VRCReader::saveFrame()
     qDebug() << fn;
 }
 /////////////////////////////////////////////////////////
+void VRCReader::timerEvent(QTimerEvent *event)
+{
+    auto timerId = event->timerId();
+    if (timerId == _timerId){
+        timeout();
+    } else {
+        killTimer(timerId);
+    }
+}
+/////////////////////////////////////////////////////////
 void VRCReader::play()
 {
-    _timer->start();
+    if (_timerId == 0) {
+        _timerId = startTimer(40);
+    }
     qDebug() << this->thread();
-    qDebug() << _timer->thread();
 }
 /////////////////////////////////////////////////////////
 void VRCReader::pause()
 {
-    _timer->stop();
+    if (_timerId != 0){
+        killTimer(_timerId);
+        _timerId = 0;
+    }
 }
 /////////////////////////////////////////////////////////
 void VRCReader::setTextToImFlag(bool fl)

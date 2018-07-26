@@ -16,8 +16,8 @@ int main(int argc, char *argv[])
 
     auto reader = std::make_unique<VRCReader>();
 
-    QObject::connect(&w, SIGNAL(takeFileName(QString*, bool)),
-                     reader.get(), SLOT(openFile(QString*, bool)), Qt::DirectConnection);
+    QObject::connect(&w, SIGNAL(takeFileName(const QString &, bool)),
+                     reader.get(), SLOT(openFile(const QString &, bool)), Qt::DirectConnection);
     QObject::connect(&w, SIGNAL(onPlayClick()),
                      reader.get(), SLOT(run()), Qt::DirectConnection);
     QObject::connect(&w, SIGNAL(onPauseClick()),

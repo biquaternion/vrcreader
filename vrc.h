@@ -4,15 +4,16 @@
 
 #ifndef VRC_H
 #define VRC_H
-//#include "QtGlobal"
+#include "QSet"
 #include "QFile"
-#include "QFileInfo"
-#include <QThread>
-#include <QObject>
-#include <QString>
 #include <QTimer>
 #include <QImage>
 #include <QLabel>
+#include <QThread>
+#include <QObject>
+#include <QString>
+#include "QFileInfo"
+#include <QTimerEvent>
 
 class VRCReader;
 
@@ -57,12 +58,10 @@ class VRCReader : public QThread
     Q_OBJECT
 public:
     VRCReader();
-    VRCReader(QString, bool putTxtToIm = false);
     ~VRCReader();
-    void        openFile(QString);
 public slots:
     void timeout();
-    void openFile(QString*, bool putTxtToIm = false);
+    void openFile(const QString &fn, bool putTxtToIm = false);
     void play();
     void run() {_dir = forward; play();}
     void back() {_dir = backward; play();}
@@ -71,18 +70,18 @@ public slots:
     void setTextToImFlag(bool);
     void saveFrame();
 private:
+    void timerEvent(QTimerEvent *event);
     enum Direction {
         backward  = 0,
         forward = 1
     };
     qint64      _numberOfBytesRead;
-    char        *_data;
     VRCHeader   *_header;
     uFrameHeader _frameHeader;
-    bool        _isFrameHeader;
-    QFile       *_file;
-    QFileInfo   *_fileInfo;
-    QTimer      *_timer;
+    QFile       _file;
+    QFileInfo   _fileInfo;
+
+    int         _timerId {0};
 
     qint64      _fSize;
     qint64      _fWidth;

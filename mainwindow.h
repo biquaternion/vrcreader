@@ -40,7 +40,7 @@ signals:
     void onBackClick();
     void onSaveFrameClick();
     void onCBOutputCLick(bool);
-    void takeFileName(QString *, bool);
+    void takeFileName(const QString &, bool);
     void lastFrame();
     void rewind(int);
 };

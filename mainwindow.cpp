@@ -37,7 +37,7 @@ MainWindow::~MainWindow()
 void MainWindow::onOpenClick()
 {
     _fileName = QFileDialog::getOpenFileName(0, "Choose File", "C:\\Dima\\WORK\\Sajene\\ARYA\\records");
-    emit takeFileName(&_fileName, ui->cbOutput->isChecked());
+    emit takeFileName(_fileName, ui->cbOutput->isChecked());
 }
 void MainWindow::changeOutputFlag()
 {
