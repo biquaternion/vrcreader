@@ -13,10 +13,11 @@ TEMPLATE = app
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    vrc.cpp
+    vrcreader.cpp \
+    vrcplayer.cpp
 
 HEADERS  += mainwindow.h \
-#    FrameIterator.h \
-    vrc.h
+    vrcreader.h \
+    vrcplayer.h
 
 FORMS    += mainwindow.ui

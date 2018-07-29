@@ -3,7 +3,7 @@
 #include <QFileDialog>
 #include <QListView>
 #include <QSettings>
-#include "vrc.h"
+#include "vrcplayer.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -41,37 +41,39 @@ void MainWindow::onOpenClick()
                        QString("vrcreader"));
     auto workDir = settings.value(QString("work directory"), QVariant(QString(""))).toString();
     _fileName = QFileDialog::getOpenFileName(this, "Choose File", workDir);
-    emit takeFileName(_fileName, ui->cbOutput->isChecked());
-    workDir = QFileInfo(_fileName).dir().path();
-    settings.setValue(QString("work directory"), workDir);
+    if (!_fileName.isEmpty()){
+        emit takeFileName(_fileName, ui->cbOutput->isChecked());
+        workDir = QFileInfo(_fileName).dir().path();
+        settings.setValue(QString("work directory"), workDir);
+    }
 }
 void MainWindow::changeOutputFlag()
 {
 
 }
-void MainWindow::metaData(VRCHeader *header)
+void MainWindow::metaData(const VRCHeader &header)
 {
     QStringList sl;
-    sl << "Version       " + QString::number(header->fVersion);
-    sl << "Frames        " + QString::number(header->fFrames);
-    sl << "Width         " + QString::number(header->fWidth);
-    sl << "Height        " + QString::number(header->fHeight);
-    sl << "Image Type    " + QString::number(header->fImageType);
-    sl << "Bits          " + QString::number(header->fBits);
-    sl << "Ofs R         " + QString::number(header->fOfsR);
-    sl << "Bits R        " + QString::number(header->fBitsR);
-    sl << "Ofs G         " + QString::number(header->fOfsG);
-    sl << "Bits G        " + QString::number(header->fBitsG);
-    sl << "Ofs B         " + QString::number(header->fOfsB);
-    sl << "Bits B        " + QString::number(header->fBitsB);
-    sl << "Interval      " + QString::number(header->fInterval);
-    sl << "Str Order     " + QString::number(header->fStrOrder);
+    sl << "Version   \t" + QString::number(header.fVersion);
+    sl << "Frames    \t" + QString::number(header.fFrames);
+    sl << "Width     \t" + QString::number(header.fWidth);
+    sl << "Height    \t" + QString::number(header.fHeight);
+    sl << "Image Type\t" + QString::number(header.fImageType);
+    sl << "Bits      \t" + QString::number(header.fBits);
+    sl << "Ofs R     \t" + QString::number(header.fOfsR);
+    sl << "Bits R    \t" + QString::number(header.fBitsR);
+    sl << "Ofs G     \t" + QString::number(header.fOfsG);
+    sl << "Bits G    \t" + QString::number(header.fBitsG);
+    sl << "Ofs B     \t" + QString::number(header.fOfsB);
+    sl << "Bits B    \t" + QString::number(header.fBitsB);
+    sl << "Interval  \t" + QString::number(header.fInterval);
+    sl << "Str Order \t" + QString::number(header.fStrOrder);
 
     slModel.setStringList(sl);
     ui->listView->setModel(&slModel);
 
-    ui->navigationSlider->setMaximum(header->fFrames);
-    ui->videoProgressBar->setMaximum(header->fFrames);
+    ui->navigationSlider->setMaximum(header.fFrames);
+    ui->videoProgressBar->setMaximum(header.fFrames);
     ui->videoProgressBar->setValue(0);
     ui->navigationSlider->setValue(0);
 }

@@ -7,7 +7,7 @@
 #include <QStringListModel>
 #include <QListView>
 #include <QTimer>
-#include "vrc.h"
+#include "vrcplayer.h"
 
 namespace Ui {
     class MainWindow;
@@ -31,7 +31,7 @@ private:
 public slots:
     void onOpenClick();
     void changeOutputFlag();
-    void metaData(VRCHeader*);
+    void metaData(const VRCHeader &header);
     void progressChanged(int val);
 signals:
     void onPlayClick();

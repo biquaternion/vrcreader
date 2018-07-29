@@ -1,6 +1,6 @@
 #include <QApplication>
 #include "mainwindow.h"
-#include "vrc.h"
+#include "vrcplayer.h"
 #include "QTimer"
 #include <QDebug>
 #include <QString>
@@ -12,31 +12,30 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     MainWindow w;
 
-    VRCReader reader;
+    VRCPlayer player;
 
     QObject::connect(&w, SIGNAL(takeFileName(const QString &, bool)),
-                     &reader, SLOT(openFile(const QString &, bool)));
+                     &player, SLOT(openFile(const QString &, bool)));
     QObject::connect(&w, SIGNAL(onPlayClick()),
-                     &reader, SLOT(run()), Qt::DirectConnection);
+                     &player, SLOT(fwd()));
     QObject::connect(&w, SIGNAL(onPauseClick()),
-                     &reader, SLOT(pause()), Qt::DirectConnection);
+                     &player, SLOT(pause()));
     QObject::connect(&w, SIGNAL(destroyed()),
-                     &reader, SLOT(pause()),
-                     Qt::DirectConnection);
+                     &player, SLOT(pause()));
     QObject::connect(&w, SIGNAL(onSaveFrameClick()),
-                     &reader, SLOT(saveFrame()), Qt::DirectConnection);
+                     &player, SLOT(saveFrame()));
     QObject::connect(&w, SIGNAL(onBackClick()),
-                     &reader, SLOT(back()), Qt::DirectConnection);
+                     &player, SLOT(back()));
     QObject::connect(&w, SIGNAL(rewind(int)),
-                     &reader, SLOT(rewind(int)), Qt::DirectConnection);
+                     &player, SLOT(rewind(int)));
     QObject::connect(&w, SIGNAL(onCBOutputCLick(bool)),
-                     &reader, SLOT(setTextToImFlag(bool)), Qt::DirectConnection);
-    QObject::connect(&reader, SIGNAL(lastFrame()),
-                     &w, SIGNAL(onPauseClick()), Qt::DirectConnection);
-    QObject::connect(&reader, SIGNAL(metaData(VRCHeader*)),
-                     &w, SLOT(metaData(VRCHeader*)), Qt::DirectConnection);
-    QObject::connect(&reader, SIGNAL(newFrame(int)),
-                     &w, SLOT(progressChanged(int)), Qt::DirectConnection);
+                     &player, SLOT(setTextToImFlag(bool)));
+    QObject::connect(&player, SIGNAL(lastFrame()),
+                     &w, SIGNAL(onPauseClick()));
+    QObject::connect(&player, SIGNAL(metaData(const VRCHeader&)),
+                     &w, SLOT(metaData(const VRCHeader&)));
+    QObject::connect(&player, SIGNAL(newFrame(int)),
+                     &w, SLOT(progressChanged(int)));
 
     w.show();
     return a.exec();
