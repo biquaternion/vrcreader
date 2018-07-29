@@ -1,3 +1,3 @@
 # vrcreader
-software to read vrc records
-программа чтения записей формата vrc
+software to read vrc records.
+программа чтения записей формата vrc.
