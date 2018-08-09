@@ -1,6 +1,6 @@
 #include <QApplication>
-#include "mainwindow.h"
-#include "vrcplayer.h"
+#include "include/mainwindow.h"
+#include "include/vrcplayer.h"
 #include "QTimer"
 #include <QDebug>
 #include <QString>

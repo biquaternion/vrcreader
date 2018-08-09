@@ -1,4 +1,4 @@
-#include "vrcplayer.h"
+#include "include/vrcplayer.h"
 #include "QDebug"
 #include <QPixmap>
 #include <QPainter>

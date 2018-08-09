@@ -1,4 +1,4 @@
-#include "vrcreader.h"
+#include "include/vrcreader.h"
 #include <QDebug>
 
 /////////////////////////////////////////////////////////

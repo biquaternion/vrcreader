@@ -1,9 +1,9 @@
-#include "mainwindow.h"
+#include "include/mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QFileDialog>
 #include <QListView>
 #include <QSettings>
-#include "vrcplayer.h"
+#include "include/vrcplayer.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),

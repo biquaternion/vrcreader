@@ -1,10 +1,10 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
+#include <QStringListModel>
 #include <QMainWindow>
 #include <QPushButton>
 #include <QHBoxLayout>
-#include <QStringListModel>
 #include <QListView>
 #include <QTimer>
 #include "vrcplayer.h"
@@ -18,7 +18,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
     QString fileName() { return _fileName; }
