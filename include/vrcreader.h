@@ -55,10 +55,10 @@ public:
     const FrameHeader &frameHeader() const;
 
     template <typename T>
-    void extractCustomMetaData(T *metaData) {
+    void extractCustomMetaData(T &metaData) {
         assert(_frameHeader.b != nullptr);
         assert(sizeof(T) < _fSize);
-        memcpy(metaData, _frameHeader.b, sizeof(metaData));
+        memcpy(&metaData, _frameHeader.b, sizeof(metaData));
     }
 
 private:

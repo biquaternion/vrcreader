@@ -21,6 +21,11 @@ class VRCPlayer : public QObject
 public:
     VRCPlayer();
     ~VRCPlayer() = default;
+
+    template <typename T>
+    void getMetaData(T &metaData) {
+        _reader.extractCustomMetaData(metaData);
+    }
 public slots:
     void play();
     void pause();
@@ -33,7 +38,7 @@ public slots:
     void setTextToImFlag(bool);
     void saveFrame();
 private:
-    void timerEvent(QTimerEvent *event);
+    void timerEvent(QTimerEvent *event) override;
     enum Direction {
         backward  = 0,
         forward = 1
