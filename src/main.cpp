@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     MainWindow w;
 
-    VRCPlayer player;
+    VRCPlayer player(w.imageWidget());
 
     QObject::connect(&w, SIGNAL(takeFileName(const QString &, bool)),
                      &player, SLOT(openFile(const QString &, bool)));
@@ -24,8 +24,10 @@ int main(int argc, char *argv[])
                      &player, SLOT(pause()));
     QObject::connect(&w, SIGNAL(onSaveFrameClick()),
                      &player, SLOT(saveFrame()));
-    QObject::connect(&w, SIGNAL(onBackClick()),
-                     &player, SLOT(back()));
+    QObject::connect(&w, SIGNAL(onNextFrameClick()),
+                     &player, SLOT(nextFrame()));
+    QObject::connect(&w, SIGNAL(onPrevFrameClick()),
+                     &player, SLOT(prevFrame()));
     QObject::connect(&w, SIGNAL(rewind(int)),
                      &player, SLOT(rewind(int)));
     QObject::connect(&w, SIGNAL(onCBOutputCLick(bool)),

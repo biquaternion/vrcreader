@@ -1,7 +1,7 @@
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.10)
 project(vrcreader)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -15,7 +15,7 @@ find_package(Qt5Gui CONFIG REQUIRED)
 set(SRC
         src/main.cpp
         src/mainwindow.cpp
-#        src/mainwindow.ui
+        src/mainwindow.ui
         src/vrcplayer.cpp
         src/vrcreader.cpp)
 set(HEADERS

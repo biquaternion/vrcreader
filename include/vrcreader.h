@@ -56,8 +56,14 @@ public:
 
     template <typename T>
     void extractCustomMetaData(T &metaData) {
-        assert(_frameHeader.b != nullptr);
-        assert(sizeof(T) < _fSize);
+        if (_frameHeader.b == nullptr) {
+            // log "no data in frame header"
+            return;
+        }
+        if (sizeof(T) > _fSize) {
+            // log "requested too big piece of data"
+            return;
+        }
         memcpy(&metaData, _frameHeader.b, sizeof(metaData));
     }
 
