@@ -11,13 +11,13 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = vrcReader
 TEMPLATE = app
 
-SOURCES += main.cpp\
-        mainwindow.cpp \
-    vrcreader.cpp \
-    vrcplayer.cpp
+SOURCES += src/main.cpp\
+        src/mainwindow.cpp \
+        src/vrcreader.cpp \
+        src/vrcplayer.cpp
 
-HEADERS  += mainwindow.h \
-    vrcreader.h \
-    vrcplayer.h
+HEADERS  += include/mainwindow.h \
+            include/vrcreader.h \
+            include/vrcplayer.h
 
-FORMS    += mainwindow.ui
+FORMS    += src/mainwindow.ui
