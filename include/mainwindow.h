@@ -32,8 +32,14 @@ private:
     QStringListModel slModel;
     std::unique_ptr<QAction> _open;
     std::shared_ptr<QAction> _play;
+    std::shared_ptr<QAction> _next;
+    std::shared_ptr<QAction> _prev;
     bool _playbackState {false};
     std::shared_ptr<QLabel> _label;
+
+    void init();
+    void initHotkeys();
+    void initConnections();
 
 public slots:
     void onOpenClick();
@@ -43,7 +49,8 @@ public slots:
 signals:
     void onPlayClick();
     void onPauseClick();
-    void onBackClick();
+    void onNextFrameClick();
+    void onPrevFrameClick();
     void onSaveFrameClick();
     void onCBOutputCLick(bool);
     void takeFileName(const QString &, bool);

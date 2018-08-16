@@ -33,6 +33,8 @@ public slots:
     void pause();
     void fwd();
     void back();
+    void nextFrame();
+    void prevFrame();
     void rewind(int frameNum);
     void timeout();
     void openFile(const QString &fileName, bool putTextToImage);

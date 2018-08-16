@@ -54,6 +54,27 @@ void VRCPlayer::back()
     play();
 }
 /////////////////////////////////////////////////////////
+void VRCPlayer::nextFrame()
+{
+    assert(_frameNumber >= 0);
+    if(_frameNumber < _reader.frames()) {
+        _frameNumber++;
+    } else {
+        _frameNumber = _reader.frames();
+    }
+    rewind(static_cast<int>(_frameNumber));
+}
+/////////////////////////////////////////////////////////
+void VRCPlayer::prevFrame()
+{
+    if (_frameNumber > 0) {
+        _frameNumber--;
+    } else {
+        _frameNumber = 0;
+    }
+    rewind(static_cast<int>(_frameNumber));
+}
+/////////////////////////////////////////////////////////
 void VRCPlayer::rewind(int frameNum)
 {
     if (_reader.readFrame(frameNum, reinterpret_cast<char*>(_image.bits()))) {

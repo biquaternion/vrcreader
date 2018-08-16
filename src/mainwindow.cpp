@@ -13,23 +13,20 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+    init();
+}
 
-    _open = std::make_unique<QAction>(this);
-    _play = std::make_unique<QAction>(this);
-    _label = std::make_shared<QLabel>(this, Qt::Window);
+MainWindow::~MainWindow()
+{
+    delete ui;
+}
 
-    this->addAction(_open.get());
-    this->addAction(_play.get());
-    _label->addAction(_play.get());
-    //QListView lv; = new QListView(this);
-    //ui->gridLayout->addWidget(&lv);
+void MainWindow::init() {
+    initHotkeys();
+    initConnections();
+}
 
-    _open->setShortcut(QKeySequence::Open);
-    _play->setShortcut(Qt::Key_Space);
-
-    connect(_open.get(), &QAction::triggered, this, &MainWindow::onOpenClick);
-    connect(_play.get(), &QAction::triggered, ui->playButton, &QPushButton::click);
-
+void MainWindow::initConnections() {
     connect(ui->openButton, SIGNAL(clicked()),
             this, SLOT(onOpenClick()));
     connect(ui->playButton, &QPushButton::clicked, [this] () {
@@ -42,23 +39,45 @@ MainWindow::MainWindow(QWidget *parent) :
         }
         _playbackState = !_playbackState;
     });
-    connect(ui->pauseButton, SIGNAL(clicked()),
-            this, SIGNAL(onPauseClick()));
+    connect(ui->nextFrameButton, SIGNAL(clicked()),
+            this, SIGNAL(onNextFrameClick()));
+    connect(ui->prevFrameButton, SIGNAL(clicked()),
+            this, SIGNAL(onPrevFrameClick()));
     connect(ui->saveButton, SIGNAL(clicked()),
             this, SIGNAL(onSaveFrameClick()));
     connect(ui->cbOutput, SIGNAL(toggled(bool)),
             this, SIGNAL(onCBOutputCLick(bool)));
-    connect(ui->backButton, SIGNAL(clicked()),
-            this, SIGNAL(onBackClick()));
     connect(ui->navigationSlider, SIGNAL(valueChanged(int)),
             this, SIGNAL(rewind(int)));
 }
+void MainWindow::initHotkeys() {
+    _open = std::make_unique<QAction>(this);
+    _play = std::make_shared<QAction>(this);
+    _next = std::make_shared<QAction>(this);
+    _prev = std::make_shared<QAction>(this);
 
-MainWindow::~MainWindow()
-{
-    delete ui;
+    _label = std::make_shared<QLabel>(this, Qt::Window);
+
+    addAction(_open.get());
+    addAction(_play.get());
+    addAction(_next.get());
+    addAction(_prev.get());
+
+    _label->addAction(_play.get());
+    _label->addAction(_next.get());
+    _label->addAction(_prev.get());
+
+    _open->setShortcut(QKeySequence::Open);
+    _play->setShortcut(Qt::Key_Space);
+    _next->setShortcut(Qt::Key_Right);
+    _prev->setShortcut(Qt::Key_Left);
+
+    connect(_open.get(), &QAction::triggered, this, &MainWindow::onOpenClick);
+    connect(_play.get(), &QAction::triggered, ui->playButton, &QPushButton::click);
+    connect(_next.get(), &QAction::triggered, ui->nextFrameButton, &QPushButton::click);
+    connect(_prev.get(), &QAction::triggered, ui->prevFrameButton, &QPushButton::click);
+
 }
-
 void MainWindow::onOpenClick()
 {
     QSettings settings(QString("NIIPP"),
@@ -72,10 +91,12 @@ void MainWindow::onOpenClick()
         ui->playButton->click();
     }
 }
+
 void MainWindow::changeOutputFlag()
 {
 
 }
+
 void MainWindow::metaData(const VRCHeader &header)
 {
     QStringList sl;
@@ -102,6 +123,7 @@ void MainWindow::metaData(const VRCHeader &header)
     ui->videoProgressBar->setValue(0);
     ui->navigationSlider->setValue(0);
 }
+
 void MainWindow::progressChanged(int val)
 {
     ui->videoProgressBar->setValue(val);
