@@ -12,6 +12,7 @@
 #include <QString>
 #include <QFileInfo>
 #include <QTimerEvent>
+#include <memory>
 #include "vrcreader.h"
 
 
@@ -20,6 +21,7 @@ class VRCPlayer : public QObject
     Q_OBJECT
 public:
     VRCPlayer();
+    explicit VRCPlayer(std::shared_ptr<QLabel> label);
     ~VRCPlayer() = default;
 
     template <typename T>
@@ -48,9 +50,9 @@ private:
     int         _timerId {0};
     int64_t     _frameNumber {0};
     QImage      _image;
-    QLabel      _label;
     QFileInfo   _fileInfo;
     bool        _putTextToImage;
+    std::shared_ptr<QLabel> _label;
 
     Direction   _dir {forward};
 signals:

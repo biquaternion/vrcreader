@@ -44,6 +44,9 @@ bool VRCReader::openFile(const QString &fn)
 }
 /////////////////////////////////////////////////////////
 bool VRCReader::readFrame(int64_t frameNum, char *data) {
+    if (!_file.isOpen()) {
+        return false;
+    }
     qint64 pos = frameNum * _fSize + 128;//_file->pos();
     _file.seek(pos);
     _numberOfBytesRead = _file.read(data, _fSize);

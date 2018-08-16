@@ -6,8 +6,10 @@
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QListView>
+#include <QAction>
 #include <QTimer>
 #include "vrcplayer.h"
+#include <memory>
 
 namespace Ui {
     class MainWindow;
@@ -22,11 +24,16 @@ public:
     ~MainWindow();
 
     QString fileName() { return _fileName; }
+    std::shared_ptr<QLabel> imageWidget() const;
 
 private:
     Ui::MainWindow *ui;
     QString _fileName;
     QStringListModel slModel;
+    std::unique_ptr<QAction> _open;
+    std::shared_ptr<QAction> _play;
+    bool _playbackState {false};
+    std::shared_ptr<QLabel> _label;
 
 public slots:
     void onOpenClick();

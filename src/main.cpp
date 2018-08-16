@@ -12,7 +12,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     MainWindow w;
 
-    VRCPlayer player;
+    VRCPlayer player(w.imageWidget());
 
     QObject::connect(&w, SIGNAL(takeFileName(const QString &, bool)),
                      &player, SLOT(openFile(const QString &, bool)));

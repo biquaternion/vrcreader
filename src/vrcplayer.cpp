@@ -3,11 +3,15 @@
 #include <QPixmap>
 #include <QPainter>
 #include <QTextItem>
+#include <include/vrcplayer.h>
 
 
 /////////////////////////////////////////////////////////
-VRCPlayer::VRCPlayer()
-{}
+VRCPlayer::VRCPlayer() :
+    _label(std::make_shared<QLabel>(nullptr, Qt::Window)) {}
+/////////////////////////////////////////////////////////
+VRCPlayer::VRCPlayer(std::shared_ptr<QLabel> label) :
+    _label(label) {}
 /////////////////////////////////////////////////////////
 void VRCPlayer::openFile(const QString &fileName, bool putTextToImage)
 {
@@ -18,7 +22,6 @@ void VRCPlayer::openFile(const QString &fileName, bool putTextToImage)
                         static_cast<int>(_reader.height()),
                         QImage::Format_Indexed8);
         _frameNumber = 0;
-        play();
         emit metaData(_reader._header);
     }
 }
@@ -98,7 +101,7 @@ void VRCPlayer::timeout()
 /////////////////////////////////////////////////////////
 void VRCPlayer::output() {
     QImage image = _image.convertToFormat(QImage::Format_RGB32);
-    _label.setPixmap(QPixmap::fromImage(image));
+    _label->setPixmap(QPixmap::fromImage(image));
     if (_putTextToImage) {
         // todo: not drawn. fix it
         QPainter painter(&image);
@@ -112,7 +115,7 @@ void VRCPlayer::output() {
                          .arg(_reader.frameHeader().r));
         painter.end();
     }
-    _label.show();
+    _label->show();
 }
 /////////////////////////////////////////////////////////
 void VRCPlayer::saveFrame()
