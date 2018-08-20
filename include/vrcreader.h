@@ -24,39 +24,23 @@ struct VRCHeader
     int32_t      fStrOrder;
     int32_t      fReserved[17];
 };
-#pragma pack(push,1)
-struct FrameHeader
-{
-    double      jd;
-    double      t;
-    double      s;
-    double      az;
-    double      el;
-    double      r;
-};
-#pragma pack(pop)
-union uFrameHeader
-{
-    FrameHeader *h;
-    char        *b;
-};
 
 class VRCReader
 {
     friend class VRCPlayer;
 public:
-    VRCReader();
+    VRCReader() = default;
     ~VRCReader();
     bool openFile(const QString &fn);
     bool readFrame(int64_t frameNum = 0, char *data = nullptr);
     int32_t frames() const;
     int32_t width() const;
     int32_t height() const;
-    const FrameHeader &frameHeader() const;
+    const uint8_t *data() const;
 
     template <typename T>
     void extractCustomMetaData(T &metaData) {
-        if (_frameHeader.b == nullptr) {
+        if (_data == nullptr) {
             // log "no data in frame header"
             return;
         }
@@ -64,13 +48,13 @@ public:
             // log "requested too big piece of data"
             return;
         }
-        memcpy(&metaData, _frameHeader.b, sizeof(metaData));
+        memcpy(&metaData, _data, sizeof(metaData));
     }
 
 private:
     int64_t      _numberOfBytesRead;
     VRCHeader    _header;
-    uFrameHeader _frameHeader;
+    uint8_t     *_data;
     QFile        _file;
 
     int32_t      _fSize;

@@ -2,8 +2,6 @@
 #include <QDebug>
 
 /////////////////////////////////////////////////////////
-VRCReader::VRCReader()
-{}
 /////////////////////////////////////////////////////////
 VRCReader::~VRCReader()
 {
@@ -32,13 +30,11 @@ bool VRCReader::openFile(const QString &fn)
     {
         qDebug() << "metadata";
     }
-//    _image = QImage(static_cast<int>(_fWidth),
-//                    static_cast<int>(_fHeight),
-//                    QImage::Format_Indexed8);
     qDebug() << _header.fWidth << " x " << _header.fHeight;
     if (_file.isOpen()) {
         return true;
     } else {
+        qDebug() << "file is not opened";
         return false;
     }
 }
@@ -53,7 +49,7 @@ bool VRCReader::readFrame(int64_t frameNum, char *data) {
     if (_numberOfBytesRead < _fSize) {
         return false;
     }
-    _frameHeader.b = reinterpret_cast<char*>(data);
+    _data = reinterpret_cast<uint8_t*>(data);
     return true;
 }
 /////////////////////////////////////////////////////////
@@ -69,8 +65,7 @@ int32_t VRCReader::height() const {
     return _fHeight;
 }
 /////////////////////////////////////////////////////////
-const FrameHeader &VRCReader::frameHeader() const
-{
-    return *_frameHeader.h;
+const uint8_t *VRCReader::data() const {
+    return _data;
 }
 /////////////////////////////////////////////////////////

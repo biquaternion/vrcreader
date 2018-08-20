@@ -4,8 +4,25 @@
 #include <QPainter>
 #include <QTextItem>
 #include <include/vrcplayer.h>
+#include <string>
+#include <iostream>
+#include <iomanip>
 
 
+///////////////////////////////////////////////////////////
+struct FrameHeader
+{
+    double      jd {0.0};
+    double      t  {0.0};
+    double      s  {0.0};
+    double      az {0.0};
+    double      el {0.0};
+    double      r  {0.0};
+};
+/////////////////////////////////////////////////////////
+inline QDebug operator << (QDebug debug, const FrameHeader & header) {
+    return debug << QString("az: %1;    el: %2").arg(header.az).arg(header.el);
+}
 /////////////////////////////////////////////////////////
 VRCPlayer::VRCPlayer() :
     _label(std::make_shared<QLabel>(nullptr, Qt::Window)) {}
@@ -126,15 +143,18 @@ void VRCPlayer::output() {
     if (_putTextToImage) {
         // todo: not drawn. fix it
         QPainter painter(&image);
+        FrameHeader frameHeader;
+        _reader.extractCustomMetaData(frameHeader);
         painter.drawText(QRect(5, 5, 200, 50), 0, QString("fInterval\t=%1\n"
                                                "Azimuth\t=%2\n"
                                                "Elevation\t=%3\n"
                                                "R\t\t=%4")
                          .arg(_reader._header.fInterval)
-                         .arg(_reader.frameHeader().az)
-                         .arg(_reader.frameHeader().el)
-                         .arg(_reader.frameHeader().r));
+                         .arg(frameHeader.az)
+                         .arg(frameHeader.el)
+                         .arg(frameHeader.r));
         painter.end();
+        //qDebug() << frameHeader;
     }
     _label->show();
 }
