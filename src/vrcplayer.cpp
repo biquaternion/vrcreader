@@ -139,12 +139,12 @@ void VRCPlayer::timeout()
 /////////////////////////////////////////////////////////
 void VRCPlayer::output() {
     QImage image = _image.convertToFormat(QImage::Format_RGB32);
-    _label->setPixmap(QPixmap::fromImage(image));
     if (_putTextToImage) {
         // todo: not drawn. fix it
         QPainter painter(&image);
         FrameHeader frameHeader;
         _reader.extractCustomMetaData(frameHeader);
+        painter.setPen(Qt::yellow);
         painter.drawText(QRect(5, 5, 200, 50), 0, QString("fInterval\t=%1\n"
                                                "Azimuth\t=%2\n"
                                                "Elevation\t=%3\n"
@@ -156,6 +156,7 @@ void VRCPlayer::output() {
         painter.end();
         //qDebug() << frameHeader;
     }
+    _label->setPixmap(QPixmap::fromImage(image));
     _label->show();
 }
 /////////////////////////////////////////////////////////
