@@ -140,12 +140,11 @@ void VRCPlayer::timeout()
 void VRCPlayer::output() {
     QImage image = _image.convertToFormat(QImage::Format_RGB32);
     if (_putTextToImage) {
-        // todo: not drawn. fix it
         QPainter painter(&image);
         FrameHeader frameHeader;
         _reader.extractCustomMetaData(frameHeader);
         painter.setPen(Qt::yellow);
-        painter.drawText(QRect(5, 5, 200, 50), 0, QString("fInterval\t=%1\n"
+        painter.drawText(QRect(5, 5, 200, 150), 0, QString("fInterval\t=%1\n"
                                                "Azimuth\t=%2\n"
                                                "Elevation\t=%3\n"
                                                "R\t\t=%4")
@@ -167,8 +166,8 @@ void VRCPlayer::saveFrame()
             _fileInfo.baseName() +
             "_frame#" + QString::number(_frameNumber) +
             ".bmp";
-    // todo: doesn't work. Learn why and fix.
-    _image.save(fn);
+    QImage imageToSave = _image.convertToFormat(QImage::Format_ARGB32);
+    imageToSave.save(fn);
     qDebug() << fn;
 }
 /////////////////////////////////////////////////////////
