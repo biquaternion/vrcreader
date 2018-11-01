@@ -123,13 +123,13 @@ void VRCPlayer::timeout()
         _frameNumber--;
     }
     if (_frameNumber >= _reader.frames()) {
-        if (_dir == forward){
+        if (_dir == forward) {
             _frameNumber = 0;
         }
         emit lastFrame();
     }
     if (_frameNumber <= 0) {
-        if (_dir == backward){
+        if (_dir == backward) {
             _frameNumber = _reader.frames();
         }
         emit lastFrame();
