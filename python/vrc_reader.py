@@ -36,6 +36,7 @@ def parse_header(header_data):
 if __name__ == '__main__':
     filename = default_filename
     fps = default_fps
+    paused = False
     if len(sys.argv) > 1:
         filename = sys.argv[1]
     if len(sys.argv) > 2:
@@ -50,6 +51,15 @@ if __name__ == '__main__':
         data = file.read(width * height * frames)
     frame = np.array(bytearray(data), np.uint8).reshape((frames, height, width))
     for i in range(frames):
-        cv2.imshow('im', frame[i])
-        if cv2.waitKey(frame_period) == ord('q'):
+        img = frame[i]
+        img = cv2.equalizeHist(img)
+        cv2.imshow('im', img)
+        if paused:
+            period = 0
+        else:
+            period = frame_period
+        key = cv2.waitKey(period)
+        if key == ord('q'):
             break
+        if key == ord(' '):
+            paused = not paused
